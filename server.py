@@ -11,20 +11,21 @@ def start_server():
             client_socket, address = server.accept()
             data = client_socket.recv(1024).decode('utf-8')
 
-            print(data)
+            try:
+                number = int(data)
+                response = number * number
+                response_text = f"The square of {number} is {response}"
+            except ValueError:
+                response_text = "Invalid input. Please send a valid number."
 
-            HDRS = 'HTTP/1.1 200 OK\r\nContent-Type: text/htmp; charset=utf-8\r\n\r\n'
-            context = 'Well done, buddy...'.encode('utf-8')
+            HDRS = 'HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'
+            context = response_text.encode('utf-8')
 
             client_socket.send(HDRS.encode('utf-8') + context)
             client_socket.shutdown(socket.SHUT_WR)
     except KeyboardInterrupt:
         server.close()
-
-        print('shutsown this shit...')
-
+        print('Shutdown server.')
 
 if __name__ == '__main__':
     start_server()
-
-    
