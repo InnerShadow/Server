@@ -29,6 +29,12 @@ class DataBase():
                              FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id)
                              )""")
             
-            
+            self.cur.execute("""CREATE TABLE IN FO EXIST billboard(
+                             billboard_id INTEGER PRIMARY KEY AUTOINCRIMENT,
+                             x_pos FLOAT,
+                             y_pos FLOAT,
+                             UNIQUE(x_pos, y_pos),
+                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id)
+                             )""")
 
     pass
