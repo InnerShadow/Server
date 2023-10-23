@@ -12,7 +12,10 @@ class DataBase():
 
             self.cur.execute("""CREATE TABLE IN FO EXIST users (
                              user_id INTEGER PRIMARY KEY AUTOINCRIMENT,
-                             login )""")
-            pass
+                             login TEXT
+                             password_hash INTEGER
+                             FOREIGN KEY (role_id) REFERENCES roles(role_id))""")
+            
+            
 
     pass
