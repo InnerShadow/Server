@@ -26,15 +26,21 @@ class DataBase():
             self.cur.execute("""CREATE TABLE IN FO EXIST billboards_groop(
                              billboards_groop_id INTEGER PRIMARY KEY AUTOINCRIMENT,
                              groop_name TEXT,
-                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id)
+                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id) NOT NULL
                              )""")
             
             self.cur.execute("""CREATE TABLE IN FO EXIST billboard(
                              billboard_id INTEGER PRIMARY KEY AUTOINCRIMENT,
-                             x_pos FLOAT,
-                             y_pos FLOAT,
+                             x_pos FLOAT NOT NULL,
+                             y_pos FLOAT NOT NULL,
                              UNIQUE(x_pos, y_pos),
-                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id)
+                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id) NOT NULL
+                             )""")
+            
+            self.cur.execute("""CREATE TABLE IN FO EXIST ad(
+                             ad_id INTEGER PRIMARY KEY AUTOINCRIMENT,
+                             vidio_url TEXT NOT NULL,
+                             ad_name TEXT
                              )""")
 
     pass
