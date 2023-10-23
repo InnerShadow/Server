@@ -22,5 +22,13 @@ class DataBase():
                              schedual_id INTEGER PRIMARY KEY AUTOINCRIMENT,
                              schedual_name TEXT 
                              )""")
+            
+            self.cur.execute("""CREATE TABLE IN FO EXIST billboards_groop(
+                             billboards_groop_id INTEGER PRIMARY KEY AUTOINCRIMENT,
+                             groop_name TEXT,
+                             FOREIGN KEY (schedual_id) REFERENCES schedual(schedual_id)
+                             )""")
+            
+            
 
     pass
