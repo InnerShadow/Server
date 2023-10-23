@@ -24,6 +24,7 @@ class DataBase:
                             role_id INTEGER NOT NULL DEFAULT 1,
                             login TEXT,
                             password_hash INTEGER,
+                            ip_address TEXT UNIQUE,
                             FOREIGN KEY (role_id) REFERENCES roles(role_id)
                             )""")
         
