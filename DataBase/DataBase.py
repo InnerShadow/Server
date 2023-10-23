@@ -31,6 +31,14 @@ class DataBase():
                              FOREIGN KEY (schedule_id) REFERENCES schedule(schedule_id)
                              )""")
             
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS ownership(
+                             billboards_group_id INTEGER,
+                             user_id INTEGER,
+                             PRIMARY KEY(billboards_group_id, user_id),
+                             FOREIGN KEY (billboards_group_id) REFERENCES billboards_group(billboards_group_id),
+                             FOREIGN KEY (user_id) REFERENCES user(user_id)
+                             )""")
+            
             self.cur.execute("""CREATE TABLE IF NOT EXISTS billboard(
                              billboard_id INTEGER PRIMARY KEY AUTOINCREMENT,
                              schedule_id INTEGER,
