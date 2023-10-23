@@ -1,6 +1,6 @@
 import sqlite3 as sq
 
-class DataBase():
+class DataBase:
 
     def __init__(self):
         with sq.connect("Data/billboards.db") as con:
