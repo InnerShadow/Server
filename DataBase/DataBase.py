@@ -49,11 +49,11 @@ class DataBase:
         
         self.cur.execute("""CREATE TABLE IF NOT EXISTS billboard(
                             billboard_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            schedule_id INTEGER,
+                            billboards_group_id INTEGER,
                             x_pos FLOAT NOT NULL,
                             y_pos FLOAT NOT NULL,
                             UNIQUE(x_pos, y_pos),
-                            FOREIGN KEY (schedule_id) REFERENCES schedule(schedule_id) 
+                            FOREIGN KEY (billboards_group_id) REFERENCES billboards_group(billboards_group_id) 
                             )""")
         
         self.cur.execute("""CREATE TABLE IF NOT EXISTS ad(
