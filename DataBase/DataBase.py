@@ -66,13 +66,12 @@ class DataBase:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS ad_schedule(
                             schedule_id INTEGER,
                             ad_id INTEGER,
-                            priority INTEGER NOT NULL,
-                            PRIMARY KEY(schedule_id, ad_id),
+                            priority INTEGER NOT NULL DEFAULT 1,
                             FOREIGN KEY (schedule_id) REFERENCES schedule(schedule_id),
                             FOREIGN KEY (ad_id) REFERENCES ad(ad_id)
                             )""")
 
-        
+
     def create_roles(self):
             self.cur.execute("SELECT role_name FROM roles")
             existing_roles = [row[0] for row in self.cur.fetchall()]
@@ -90,3 +89,4 @@ class DataBase:
             pass
 
     pass
+
