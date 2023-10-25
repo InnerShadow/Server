@@ -3,10 +3,26 @@ from DataBase.DataBase import *
 
 class Server:
 
-    def __init__(self, host, port):
-        self.host = host
+    def __init__(self, port):
+        self.host = self.get_local_ip_address()
         self.port = port
         self.dataBase = DataBase()
+        print(self.host)
+
+
+    def get_local_ip_address(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.settimeout(0.1)
+            
+            s.connect(("8.8.8.8", 80))
+            local_ip_address = s.getsockname()[0]
+            s.close()
+            
+            return local_ip_address
+        except Exception as e:
+            print(f"Error getting local IP address: {e}")
+            return None
 
 
     def start_server(self):
