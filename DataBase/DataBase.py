@@ -12,6 +12,8 @@ class DataBase:
 
             con.commit()
 
+        pass
+
     
     def create_tables(self):
         self.cur.execute("""CREATE TABLE IF NOT EXISTS roles (
@@ -45,7 +47,7 @@ class DataBase:
                             user_id INTEGER,
                             PRIMARY KEY(billboards_group_id, user_id),
                             FOREIGN KEY (billboards_group_id) REFERENCES billboards_group(billboards_group_id),
-                            FOREIGN KEY (user_id) REFERENCES user(user_id)
+                            FOREIGN KEY (user_id) REFERENCES users(user_id)
                             )""")
         
         self.cur.execute("""CREATE TABLE IF NOT EXISTS billboard(
@@ -70,6 +72,7 @@ class DataBase:
                             FOREIGN KEY (schedule_id) REFERENCES schedule(schedule_id),
                             FOREIGN KEY (ad_id) REFERENCES ad(ad_id)
                             )""")
+        pass
 
 
     def create_roles(self):
@@ -87,6 +90,24 @@ class DataBase:
                     self.cur.execute("INSERT INTO roles (role_name) VALUES (?)", role)
 
             pass
+    
+
+    def Get_billboards(self):
+        query = """
+            SELECT BG.group_name, U.login, S.schedule_name, B.x_pos, B.y_pos
+            FROM billboards_group AS BG
+            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            JOIN users AS U ON O.user_id = U.user_id
+            JOIN schedule AS S ON BG.schedule_id = S.schedule_id
+            JOIN billboard AS B ON BG.billboards_group_id = B.billboards_group_id
+        """
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+
+        print(result)
+
+        return " \n ".join([f"Group: {group_name}, Owner: {owner}, Schedule: {schedule_name}, X: {x}, Y: {y}" for group_name, owner, schedule_name, x, y in result])
+        pass
 
     pass
 
