@@ -111,10 +111,10 @@ class DataBase:
         query = """
             SELECT A.video_url, A.ad_name
             FROM ad AS A
-            JOIN ad_schedule AS ASchedule ON A.ad_id = ASchedule.ad_id
-            JOIN schedule AS S ON ASchedule.schedule_id = S.schedule_id
+            JOIN ad_schedule AS ADSchedule ON A.ad_id = ADSchedule.ad_id
+            JOIN schedule AS S ON ADSchedule.schedule_id = S.schedule_id
             WHERE S.schedule_name = ?
-            ORDER BY ASchedule.priority"""
+            ORDER BY ADSchedule.priority"""
         
         self.cur.execute(query, (schedule_name,))
         result = self.cur.fetchall()
