@@ -1,5 +1,7 @@
 import socket
+import re
 from DataBase.DataBase import *
+
 
 class Server:
 
@@ -37,11 +39,16 @@ class Server:
                 client_socket, address = server.accept()
                 data = client_socket.recv(1024).decode('utf-8')
 
+                schedules_pattern = r'GET GROUP SCHEDULES schedules_name = (\w+)'
+                schedules_match = re.search(schedules_pattern, data)
+
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()
-                    else:
-                        response_text = "Invalid input. Please send 'GET_BILLBOARDS'."
+                            
+                    if schedules_match:
+                        schedules_name = schedules_match.group(1)
+                        response_text = self.dataBase.Get_schedule_contents(schedules_name)
 
                     context = response_text.encode('utf-8')
 

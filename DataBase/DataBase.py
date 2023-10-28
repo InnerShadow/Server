@@ -99,15 +99,29 @@ class DataBase:
             JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
             JOIN users AS U ON O.user_id = U.user_id
             JOIN schedule AS S ON BG.schedule_id = S.schedule_id
-            JOIN billboard AS B ON BG.billboards_group_id = B.billboards_group_id
-        """
+            JOIN billboard AS B ON BG.billboards_group_id = B.billboards_group_id"""
+        
         self.cur.execute(query)
+        result = self.cur.fetchall()
+
+        return " \n ".join([f"Group: {group_name}, Owner: {owner}, Schedule: {schedule_name}, X: {x}, Y: {y}" for group_name, owner, schedule_name, x, y in result])
+
+
+    def Get_schedule_contents(self, schedule_name):
+        query = """
+            SELECT A.video_url, A.ad_name
+            FROM ad AS A
+            JOIN ad_schedule AS ASchedule ON A.ad_id = ASchedule.ad_id
+            JOIN schedule AS S ON ASchedule.schedule_id = S.schedule_id
+            WHERE S.schedule_name = ?
+            ORDER BY ASchedule.priority"""
+        
+        self.cur.execute(query, (schedule_name,))
         result = self.cur.fetchall()
 
         print(result)
 
-        return " \n ".join([f"Group: {group_name}, Owner: {owner}, Schedule: {schedule_name}, X: {x}, Y: {y}" for group_name, owner, schedule_name, x, y in result])
-        pass
+        return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}" for video_url, ad_name in result])
 
     pass
 
