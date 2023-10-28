@@ -5,7 +5,7 @@ from DataBase.DataBase import *
 
 class Server:
 
-    def __init__(self, port):
+    def __init__(self, port : int):
         self.host = self.get_local_ip_address()
         self.port = port
         self.dataBase = DataBase()
