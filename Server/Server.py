@@ -1,7 +1,8 @@
-import socket
 import re
-from DataBase.DataBase import *
+import socket
 
+from DataBase.DataBase import *
+from Entity.Timer import *
 
 class Server:
 
@@ -9,6 +10,7 @@ class Server:
         self.host = self.get_local_ip_address()
         self.port = port
         self.dataBase = DataBase()
+        self.timer = Timer()
         print(self.host)
 
 
@@ -45,6 +47,9 @@ class Server:
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()
+
+                    if data == "GET_TIME":
+                        response_text = self.timer.init_time
                             
                     if schedules_match:
                         schedules_name = schedules_match.group(1)

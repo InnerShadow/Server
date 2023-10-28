@@ -1,4 +1,5 @@
 import sqlite3 as sq
+from moviepy.editor import VideoFileClip
 
 class DataBase:
 
@@ -107,7 +108,7 @@ class DataBase:
         return " \n ".join([f"Group: {group_name}, Owner: {owner}, Schedule: {schedule_name}, X: {x}, Y: {y}" for group_name, owner, schedule_name, x, y in result])
 
 
-    def Get_schedule_contents(self, schedule_name):
+    def Get_schedule_contents(self, schedule_name : str):
         query = """
             SELECT A.video_url, A.ad_name
             FROM ad AS A
@@ -116,12 +117,22 @@ class DataBase:
             WHERE S.schedule_name = ?
             ORDER BY ADSchedule.priority"""
         
-        self.cur.execute(query, (schedule_name,))
+        self.cur.execute(query, (schedule_name, ))
         result = self.cur.fetchall()
 
         print(result)
 
-        return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}" for video_url, ad_name in result])
+        return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}, Ad_duration: {self.get_video_duration(video_url)}" for video_url, ad_name in result])
 
-    pass
+    
+    def get_video_duration(self, video_path : str):
+        try:
+            clip = VideoFileClip(video_path)
+            duration = clip.duration
+            clip.reader.close()
+            return duration
+        except Exception as e:
+            return None
+
+
 
