@@ -26,7 +26,8 @@ class DataBase:
                             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             role_id INTEGER NOT NULL DEFAULT 1,
                             login TEXT,
-                            password_hash INTEGER,
+                            password_hash TEXT,
+                            password_salt TEXT,
                             ip_address TEXT UNIQUE,
                             FOREIGN KEY (role_id) REFERENCES roles(role_id)
                             )""")
@@ -134,7 +135,7 @@ class DataBase:
             GROUP BY BG.group_name
         """
         
-        self.cur.execute(query, (owner_name,))
+        self.cur.execute(query, (owner_name, ))
         result = self.cur.fetchall()
 
         return " \n ".join([f"Group: {group_name}, Billboard_Count: {billboard_count}" for group_name, billboard_count in result])
