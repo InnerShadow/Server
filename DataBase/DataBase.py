@@ -121,6 +121,23 @@ class DataBase:
         result = self.cur.fetchall()
 
         return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}, Ad_duration: {self.get_video_duration(video_url)}" for video_url, ad_name in result])
+    
+
+    def GetGroupsAndBillboardCounts(self, owner_name):
+        query = """
+            SELECT BG.group_name, COUNT(B.billboard_id) AS billboard_count
+            FROM billboards_group AS BG
+            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            JOIN users AS U ON O.user_id = U.user_id
+            JOIN billboard AS B ON BG.billboards_group_id = B.billboards_group_id
+            WHERE U.login = ?
+            GROUP BY BG.group_name
+        """
+        
+        self.cur.execute(query, (owner_name,))
+        result = self.cur.fetchall()
+
+        return " \n ".join([f"Group: {group_name}, Billboard_Count: {billboard_count}" for group_name, billboard_count in result])
 
     
     def get_video_duration(self, video_path : str):
