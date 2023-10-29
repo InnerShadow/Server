@@ -23,7 +23,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.2"
+            return "127.0.0.6"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -44,6 +44,9 @@ class Server:
                 schedules_pattern = r'GET GROUP SCHEDULES schedules_name = (\w+)'
                 schedules_match = re.search(schedules_pattern, data)
 
+                ad_pattern = r'ad_path = (.*?)$'
+                ad_match = re.search(ad_pattern, data) 
+
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()
@@ -55,7 +58,19 @@ class Server:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
 
-                    context = response_text.encode('utf-8')
+                    if ad_match:
+                        vidio_url = ad_match.group(1)
+                        response_text = open(vidio_url, 'rb').read()
+
+                    if isinstance(response_text, str):
+                        print(response_text)
+                        context = response_text.encode('utf-8')
+
+                    elif isinstance(response_text, bytes):
+                        context = response_text
+
+                    else:
+                        context = b''  
 
                     client_socket.send(context)
                     client_socket.shutdown(socket.SHUT_WR)

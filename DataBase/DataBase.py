@@ -120,8 +120,6 @@ class DataBase:
         self.cur.execute(query, (schedule_name, ))
         result = self.cur.fetchall()
 
-        print(result)
-
         return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}, Ad_duration: {self.get_video_duration(video_url)}" for video_url, ad_name in result])
 
     
@@ -133,6 +131,4 @@ class DataBase:
             return duration
         except Exception as e:
             return None
-
-
 
