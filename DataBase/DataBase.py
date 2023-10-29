@@ -132,8 +132,7 @@ class DataBase:
             JOIN users AS U ON O.user_id = U.user_id
             JOIN billboard AS B ON BG.billboards_group_id = B.billboards_group_id
             WHERE U.login = ?
-            GROUP BY BG.group_name
-        """
+            GROUP BY BG.group_name"""
         
         self.cur.execute(query, (owner_name, ))
         result = self.cur.fetchall()
