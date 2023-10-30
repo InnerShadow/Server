@@ -1,10 +1,16 @@
 import sqlite3 as sq
 from moviepy.editor import VideoFileClip
 
+from Entity.Encoder import Encoder
+
 class DataBase:
 
     def __init__(self):
+
         with sq.connect("Data/billboards.db") as con:
+
+            self.con = con
+
             self.cur = con.cursor()
 
             self.create_tables()
@@ -28,9 +34,9 @@ class DataBase:
                             login TEXT,
                             password_hash TEXT,
                             password_salt TEXT,
-                            ip_address TEXT UNIQUE,
+                            ip_address TEXT,
                             FOREIGN KEY (role_id) REFERENCES roles(role_id)
-                            )""")
+                            )""") # delete unique ip_address
         
         self.cur.execute("""CREATE TABLE IF NOT EXISTS schedule(
                             schedule_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -138,8 +144,44 @@ class DataBase:
         result = self.cur.fetchall()
 
         return " \n ".join([f"Group: {group_name}, Billboard_Count: {billboard_count}" for group_name, billboard_count in result])
+    
+
+    def getHashAndSalt(self, username : str):
+        query = """
+            SELECT U.password_hash, U.password_salt
+            FROM users as U
+            WHERE U.login = ?"""
+        
+        self.cur.execute(query, (username, ))
+        resualt = self.cur.fetchone()
+
+        return resualt[0], resualt[1]
+    
+
+    def updateIP(self, username : str, ip_address : str):
+        query = "UPDATE users SET ip_address = ? WHERE login = ?"
+        self.cur.execute(query, (ip_address, username))
+        self.con.commit()
 
     
+    def register_user(self, role : str, username : str, password : str, ip_address : str):
+        encoder = Encoder()
+
+        if role == 'viewer':
+            role_id = 1
+        elif role == 'owner':
+            role_id = 2
+        elif role == 'admin':
+            role_id = 3
+
+        salt, hashed_password = encoder.getSaltAndHash(password)
+
+        self.cur.execute("INSERT INTO users (role_id, login, password_hash, password_salt, ip_address) VALUES (?, ?, ?, ?, ?)"
+                         , (role_id, username, hashed_password, salt, ip_address))
+        
+        self.con.commit()
+
+
     def get_video_duration(self, video_path : str):
         try:
             clip = VideoFileClip(video_path)
