@@ -164,7 +164,7 @@ class DataBase:
         self.con.commit()
 
     
-    def register_user(self, role : str, username : str, password : str, ip_address : str):
+    def register_user(self, ip_address : str, role : str = None, username : str = None, password : str = None):
         encoder = Encoder()
 
         if role == 'viewer':

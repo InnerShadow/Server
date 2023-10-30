@@ -33,7 +33,6 @@ class Server:
 
 
     def start_server(self):
-        #self.dataBase.register_user('admin', "Test_admin", "1212", "127.0.0.1")
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server.bind((self.host, self.port))
@@ -65,6 +64,10 @@ class Server:
                     elif data == "GET_TIME":
                         response_text = self.timer.init_time
 
+                    elif data == "CONTINUE AS VIEWER":
+                        self.dataBase.register_user(client_address[0], 'viewer', 'simple_viewer', 'password')
+                        response_text = "OK"
+
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
@@ -77,7 +80,7 @@ class Server:
                         username = register_match.group(1)
                         password = register_match.group(2)
                         role = register_match.group(3)
-                        self.dataBase.register_user(role, username, password, client_address[0])
+                        self.dataBase.register_user(client_address[0], role, username, password)
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)
