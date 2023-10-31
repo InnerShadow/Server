@@ -146,16 +146,20 @@ class DataBase:
         return " \n ".join([f"Group: {group_name}, Billboard_Count: {billboard_count}" for group_name, billboard_count in result])
     
 
-    def getHashAndSalt(self, username : str):
+    def getHashAndSalt(self, username: str):
         query = """
             SELECT U.password_hash, U.password_salt
             FROM users as U
             WHERE U.login = ?"""
         
         self.cur.execute(query, (username, ))
-        resualt = self.cur.fetchone()
+        result = self.cur.fetchone()
 
-        return resualt[0], resualt[1]
+        if result is not None:
+            return result[0], result[1]
+        else:
+            return None, None 
+
     
 
     def updateIP(self, username : str, ip_address : str):

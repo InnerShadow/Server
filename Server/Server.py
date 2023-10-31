@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.15"
+            return "127.0.0.1"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -87,14 +87,19 @@ class Server:
                         password = indendefication_match.group(2)
 
                         encoder = Encoder()
-                        password_hash, _ = self.dataBase.getHashAndSalt(username)
-                        resualt = encoder.checkpw(password, password_hash)
-                        if resualt:
-                            response_text = "IDENDEFICATION OK" 
-                            self.dataBase.updateIP(username, client_address[0])
+                        password_hash, salt = self.dataBase.getHashAndSalt(username)
+
+                        if password_hash is None or salt is None:
+                            response_text = "IDENTIFICATION NOT OK"
 
                         else:
-                            response_text = "IDENDEFICATION NOT OK"
+                            resualt = encoder.checkpw(password, password_hash)
+                            if resualt:
+                                response_text = "IDENDEFICATION OK" 
+                                self.dataBase.updateIP(username, client_address[0])
+
+                            else:
+                                response_text = "IDENDEFICATION NOT OK"
 
                     elif ad_match:
                         vidio_url = ad_match.group(1)
