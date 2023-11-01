@@ -36,7 +36,7 @@ class DataBase:
                             password_salt TEXT,
                             ip_address TEXT,
                             FOREIGN KEY (role_id) REFERENCES roles(role_id)
-                            )""") # delete unique ip_address
+                            )""")
         
         self.cur.execute("""CREATE TABLE IF NOT EXISTS schedule(
                             schedule_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -184,6 +184,19 @@ class DataBase:
                          , (role_id, username, hashed_password, salt, ip_address))
         
         self.con.commit()
+
+    
+    def getRole(self, username : str):
+        query = """
+        Select R.role_name
+        FROM roles as R 
+        INNER JOIN users as U ON U.role_id = R.role_id
+        WHERE U.login = ?"""
+
+        self.cur.execute(query, (username, ))
+        result = self.cur.fetchone()
+
+        return result[0]
 
 
     def get_video_duration(self, video_path : str):

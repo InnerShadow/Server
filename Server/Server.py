@@ -12,6 +12,7 @@ class Server:
         self.port = port
         self.dataBase = DataBase()
         self.timer = Timer()
+        self.encoder = Encoder()
         print(self.host)
 
 
@@ -25,7 +26,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.1"
+            return "127.0.0.4"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -86,16 +87,17 @@ class Server:
                         username = indendefication_match.group(1)
                         password = indendefication_match.group(2)
 
-                        encoder = Encoder()
                         password_hash, salt = self.dataBase.getHashAndSalt(username)
+
+                        role = self.dataBase.getRole(username)
 
                         if password_hash is None or salt is None:
                             response_text = "IDENTIFICATION NOT OK"
 
                         else:
-                            resualt = encoder.checkpw(password, password_hash)
+                            resualt = self.encoder.checkpw(password, password_hash)
                             if resualt:
-                                response_text = "IDENDEFICATION OK" 
+                                response_text = f"IDENDEFICATION OK role = {role} " 
                                 self.dataBase.updateIP(username, client_address[0])
 
                             else:
