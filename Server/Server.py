@@ -26,7 +26,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.4"
+            return "127.0.0.5"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -89,12 +89,11 @@ class Server:
 
                         password_hash, salt = self.dataBase.getHashAndSalt(username)
 
-                        role = self.dataBase.getRole(username)
-
                         if password_hash is None or salt is None:
                             response_text = "IDENTIFICATION NOT OK"
 
                         else:
+                            role = self.dataBase.getRole(username)
                             resualt = self.encoder.checkpw(password, password_hash)
                             if resualt:
                                 response_text = f"IDENDEFICATION OK role = {role} " 
