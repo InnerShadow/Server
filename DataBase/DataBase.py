@@ -5,7 +5,6 @@ from Entity.VideoPreprocer import VideoPreprocer
 from DataBase.DataBaseCreater import DataBaseCreater
 
 class DataBase:
-
     def __init__(self):
         with sq.connect("Data/billboards.db") as con:
             self.con = con
@@ -67,7 +66,7 @@ class DataBase:
         return " \n ".join([f"Video_url: {video_url}, Ad_name: {ad_name}, Ad_duration: {videoPreprocer.get_video_duration(video_url)}" for video_url, ad_name in result])
     
 
-    def GetGroupsAndBillboardCounts(self, owner_name):
+    def GetGroupsAndBillboardCounts(self, owner_name : str):
         query = """
             SELECT BG.group_name, COUNT(B.billboard_id) AS billboard_count
             FROM billboards_group AS BG
