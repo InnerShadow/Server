@@ -123,14 +123,37 @@ class DataBase:
     
     def getRole(self, username : str):
         query = """
-        Select R.role_name
-        FROM roles as R 
-        INNER JOIN users as U ON U.role_id = R.role_id
-        WHERE U.login = ?"""
+            Select R.role_name
+            FROM roles as R 
+            INNER JOIN users as U ON U.role_id = R.role_id
+            WHERE U.login = ?"""
 
         self.cur.execute(query, (username, ))
         result = self.cur.fetchone()
 
         return result[0]
 
+
+    def delete_viewers(self):
+        query = """
+            DELETE FROM users
+            WHERE login = 'simple_viewer' AND role_id = (
+                SELECT role_id FROM roles WHERE role_name = 'viewer'
+            )"""
+        
+        self.cur.execute(query)
+        self.con.commit()
+
+
+    def get_owners(self):
+        query = """
+            SELECT login
+            FROM users
+            WHERE role_id = (SELECT role_id FROM roles WHERE role_name = 'owner')"""
+
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        owner_names = [row[0] for row in result]
+
+        return " \n ".join([f"Owner Name: {owner_name}" for owner_name in owner_names])
 

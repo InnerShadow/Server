@@ -34,6 +34,9 @@ class Server:
 
 
     def start_server(self):
+
+        #self.dataBase.register_user("127.0.0.5", "admin", "admin", "1212")
+
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server.bind((self.host, self.port))
@@ -68,6 +71,9 @@ class Server:
                     elif data == "CONTINUE AS VIEWER":
                         self.dataBase.register_user(client_address[0], 'viewer', 'simple_viewer', 'password')
                         response_text = "OK"
+
+                    elif data == "GET OWNERS":
+                        response_text = self.dataBase.get_owners()
 
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
@@ -124,6 +130,7 @@ class Server:
                 except Exception as e:
                     print(f"Error: {e}")
         except KeyboardInterrupt:
+            self.dataBase.delete_viewers()
             server.close()
             print('Shutdown server.')
 
