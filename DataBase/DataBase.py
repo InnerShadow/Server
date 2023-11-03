@@ -155,5 +155,74 @@ class DataBase:
         result = self.cur.fetchall()
         owner_names = [row[0] for row in result]
 
-        return " \n ".join([f"Owner Name: {owner_name}" for owner_name in owner_names])
+        return " \n ".join([f"Owner name = {owner_name}" for owner_name in owner_names])
 
+
+    def transfer_ownership(self, transfer_to : str, billboard_group_name : str):
+
+        query = "SELECT user_id FROM users WHERE login = ?"
+        self.cur.execute(query, (transfer_to, ))
+        new_owner_id = self.cur.fetchone()
+
+        query = "SELECT billboards_group_id FROM billboards_group WHERE group_name = ?"
+        self.cur.execute(query, (billboard_group_name, ))
+        group_id = self.cur.fetchone()
+
+        query = "SELECT user_id FROM ownership WHERE billboards_group_id = ?"
+        self.cur.execute(query, (group_id[0], ))
+        current_owner_id = self.cur.fetchone()
+
+        query = """
+            UPDATE ownership
+            SET user_id = ?
+            WHERE billboards_group_id = ? AND user_id = ? """
+
+        self.cur.execute(query, (new_owner_id[0], group_id[0], current_owner_id[0]))
+        self.con.commit()
+
+        return "Ownership transferred successfully"
+
+
+    def getAllAds(self):
+        query = "SELECT ad_name FROM ad"
+
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        ads = [row[0] for row in result]
+
+        return " \n ".join([f"Ad = {ad_name}" for ad_name in ads]) + " "
+
+
+    def create_schedule(self, schedulesName, ad_list):
+        query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+        self.cur.execute(query, (schedulesName,))
+        existing_schedule_id = self.cur.fetchone()
+
+        if existing_schedule_id:
+            return "Schedule with the same name already exists"
+
+        query = "INSERT INTO schedule (schedule_name) VALUES (?)"
+        self.cur.execute(query, (schedulesName,))
+        self.con.commit()
+
+        query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+        self.cur.execute(query, (schedulesName,))
+        schedule_id = self.cur.fetchone()
+
+        if not schedule_id:
+            return "Failed to create schedule"
+
+        for priority, ad_name in enumerate(ad_list, start=1):
+            query = """
+                INSERT INTO ad_schedule (schedule_id, ad_id, priority)
+                SELECT ?, A.ad_id, ?
+                FROM ad AS A
+                WHERE A.ad_name = ?
+            """
+            self.cur.execute(query, (schedule_id[0], priority, ad_name))
+        
+        self.con.commit()
+
+        return "Schedule created successfully"
+    
+    

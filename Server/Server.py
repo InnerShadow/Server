@@ -17,7 +17,6 @@ class Server:
 
 
     def get_local_ip_address(self):
-
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.settimeout(0.1)
@@ -26,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.5"
+            return "127.0.0.8"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -35,7 +34,7 @@ class Server:
 
     def start_server(self):
 
-        #self.dataBase.register_user("127.0.0.5", "admin", "admin", "1212")
+        #self.dataBase.register_user("127.0.0.5", "owner", "Dima", "1212")
 
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,6 +46,8 @@ class Server:
             groop_owner_patter = r'GET GROOP BY OWNER owner = (\w+)'
             indendefication_pater = r'TRY TO LOG IN login = (\w+), password = (\w+)'
             register_patter = r'RESIGTER USER login = (\w+), password = (\w+), role = (\w+)'
+            transfer_pattern = r'TRANSFER OWNERSHIP OF (\w+) TO (\w+)'
+            create_schedules_pattern = r'CREATE SCHEDULES Schedule Name: (\w+)'
 
             while True:
                 print('Working...')
@@ -58,6 +59,8 @@ class Server:
                 groop_owner_match = re.search(groop_owner_patter, data)
                 indendefication_match = re.search(indendefication_pater, data)
                 register_match = re.search(register_patter, data)
+                transfer_match = re.search(transfer_pattern, data)
+                create_schedules_match = re.search(create_schedules_pattern, data)
 
                 print(data)
 
@@ -75,6 +78,9 @@ class Server:
                     elif data == "GET OWNERS":
                         response_text = self.dataBase.get_owners()
 
+                    elif data == "GET ALL ADS":
+                        response_text = self.dataBase.getAllAds()
+
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
@@ -88,6 +94,21 @@ class Server:
                         password = register_match.group(2)
                         role = register_match.group(3)
                         self.dataBase.register_user(client_address[0], role, username, password)
+
+                    elif transfer_match:
+                        billboard_grop = transfer_match.group(1)
+                        username = transfer_match.group(2)
+                        response_text = self.dataBase.transfer_ownership(username, billboard_grop)
+
+                    elif create_schedules_match:
+                        schedules_name = create_schedules_match.group(1)
+                        ad_name_pattern = r'ad_name = (\w+(?: \w+)*)'
+                        schedules = []
+
+                        for match in re.finditer(ad_name_pattern, data):
+                            schedules.append(match.group(1))
+
+                        response_text = self.dataBase.create_schedule(schedules_name, schedules)
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)
