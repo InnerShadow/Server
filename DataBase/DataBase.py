@@ -393,14 +393,14 @@ class DataBase:
     
     def createBillboard(self, username: str, group: str, x_pos: float, y_pos: float):
         query = "SELECT user_id FROM users WHERE login = ?"
-        self.cur.execute(query, (username,))
+        self.cur.execute(query, (username, ))
         user_id = self.cur.fetchone()
 
         if not user_id:
             return "User not found"
 
         query = "SELECT billboards_group_id, schedule_id FROM billboards_group WHERE group_name = ?"
-        self.cur.execute(query, (group,))
+        self.cur.execute(query, (group, ))
         group_info = self.cur.fetchone()
 
         if not group_info:
@@ -409,11 +409,11 @@ class DataBase:
         if not group_info[1]:
             schedule_name = f"{group} Schedule"
             query = "INSERT INTO schedule (schedule_name) VALUES (?)"
-            self.cur.execute(query, (schedule_name,))
+            self.cur.execute(query, (schedule_name, ))
             self.con.commit()
 
             query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
-            self.cur.execute(query, (schedule_name,))
+            self.cur.execute(query, (schedule_name, ))
             schedule_id = self.cur.fetchone()
             if not schedule_id:
                 return "Failed to create schedule"
