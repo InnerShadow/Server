@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.19"
+            return "127.0.0.21"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -48,7 +48,7 @@ class Server:
             register_patter = r'RESIGTER USER login = (\w+), password = (\w+), role = (\w+)'
             transfer_pattern = r'TRANSFER OWNERSHIP OF (\w+) TO (\w+)'
             create_schedules_pattern = r'CREATE SCHEDULES Schedule Name: (\w+)'
-            edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = "
+            edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = (\w+)"
             create_group_pattern = r'GET CREATE GROUP group_name = (\w+), schedule_name = (\w+)'
             get_groups_pattern = r'GET ALL GROOPS for user = (\w+)'
             move_pattern = r'MOVE BILLBOARDS x = (\d+(?:\.\d+)?), y = (\d+(?:\.\d+)?) TO GROUP name = (\w+)'

@@ -227,7 +227,7 @@ class DataBase:
 
     def edit_schedule(self, schedulesName: str, ad_list: list[str]):
         query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
-        self.cur.execute(query, (schedulesName,))
+        self.cur.execute(query, (schedulesName, ))
         schedule_id = self.cur.fetchone()
 
         if not schedule_id:
