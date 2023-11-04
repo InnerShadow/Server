@@ -391,8 +391,51 @@ class DataBase:
         return "Password updated successfully"
 
     
-    def create_ad(self, file_name: str, file_path: str):
-        query = "INSERT INTO ad (video_url, ad_name) VALUES (?, ?)"
-        self.cur.execute(query, (file_path, file_name))
+    def createBillboard(self, username: str, group: str, x_pos: float, y_pos: float):
+        query = "SELECT user_id FROM users WHERE login = ?"
+        self.cur.execute(query, (username,))
+        user_id = self.cur.fetchone()
+
+        if not user_id:
+            return "User not found"
+
+        query = "SELECT billboards_group_id, schedule_id FROM billboards_group WHERE group_name = ?"
+        self.cur.execute(query, (group,))
+        group_info = self.cur.fetchone()
+
+        if not group_info:
+            return "Billboards group not found"
+
+        if not group_info[1]:
+            schedule_name = f"{group} Schedule"
+            query = "INSERT INTO schedule (schedule_name) VALUES (?)"
+            self.cur.execute(query, (schedule_name,))
+            self.con.commit()
+
+            query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+            self.cur.execute(query, (schedule_name,))
+            schedule_id = self.cur.fetchone()
+            if not schedule_id:
+                return "Failed to create schedule"
+
+            query = "UPDATE billboards_group SET schedule_id = ? WHERE billboards_group_id = ?"
+            self.cur.execute(query, (schedule_id[0], group_info[0]))
+            self.con.commit()
+
+        query = "SELECT * FROM ownership WHERE billboards_group_id = ? AND user_id = ?"
+        self.cur.execute(query, (group_info[0], user_id[0]))
+        existing_ownership = self.cur.fetchone()
+
+        query = "INSERT INTO billboard (billboards_group_id, x_pos, y_pos) VALUES (?, ?, ?)"
+        self.cur.execute(query, (group_info[0], x_pos, y_pos))
         self.con.commit()
+
+        if existing_ownership:
+            return "Ownership relationship already exists"
+
+        query = "INSERT INTO ownership (billboards_group_id, user_id) VALUES (?, ?)"
+        self.cur.execute(query, (group_info[0], user_id[0]))
+        self.con.commit()
+
+        return "Billboard created successfully"
 

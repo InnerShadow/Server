@@ -56,6 +56,7 @@ class Server:
             set_schedules_patern = r'SET SCHEDULE name = (\w+), FOR GROUP name = (\w+)'
             change_password_pattern = r'USER name = (\w+) CHANGE PASSWORD FROM old = (\w+), TO new = (\w+)'
             upload_file_pattern = r'UPLOAD FILE file_name = (\w+)'
+            create_billboard_pattern = r'CREATE NEW BILLBOARD FOR user = (\w+) IN group = (\w+) x_pos = ([\d.]+), y_pos = ([\d.]+)'
 
             while True:
                 print('Working...')
@@ -77,6 +78,7 @@ class Server:
                 set_schedules_match = re.search(set_schedules_patern, data)
                 change_password_match = re.search(change_password_pattern, data)
                 upload_file_match = re.search(upload_file_pattern, data)
+                create_billboard_match = re.search(create_billboard_pattern, data)
 
                 print(data)
 
@@ -142,6 +144,14 @@ class Server:
                         schedules = set_schedules_match.group(1)
                         group = set_schedules_match.group(2)
                         response_text = self.dataBase.setSchedules(schedules, group)
+
+                    elif create_billboard_match:
+                        username = create_billboard_match.group(1)
+                        group = create_billboard_match.group(2)
+                        x_pos = float(create_billboard_match.group(3))
+                        y_pos = float(create_billboard_match.group(4))
+
+                        response_text = self.dataBase.createBillboard(username, group, x_pos, y_pos)
 
                     elif change_password_match:
                         username = change_password_match.group(1)
