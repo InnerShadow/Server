@@ -333,3 +333,47 @@ class DataBase:
 
         return "Billboard moved successfully"
 
+
+    def getSchedulesForUser(self, owner: str):
+        query = """
+            SELECT DISTINCT S.schedule_name
+            FROM schedule AS S
+            JOIN ad_schedule AS ASch ON S.schedule_id = ASch.schedule_id
+            JOIN ad AS A ON ASch.ad_id = A.ad_id
+            JOIN billboards_group AS BG ON BG.schedule_id = S.schedule_id
+            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            JOIN users AS U ON O.user_id = U.user_id
+            WHERE U.login = ?
+            UNION
+            SELECT DISTINCT S.schedule_name
+            FROM schedule AS S
+            WHERE S.schedule_id NOT IN (
+                SELECT schedule_id
+                FROM ad_schedule)"""
+        self.cur.execute(query, (owner,))
+        result = self.cur.fetchall()
+        schedules = [row[0] for row in result]
+
+        return " \n ".join([f"Schedule Name = {schedule_name}" for schedule_name in schedules]) + " "
+
+
+    def setSchedules(self, schedules: str, group: str):
+        query_schedule_id = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+        self.cur.execute(query_schedule_id, (schedules, ))
+        schedule_id = self.cur.fetchone()
+
+        if not schedule_id:
+            return "Schedule not found"
+
+        query_group_id = "SELECT billboards_group_id FROM billboards_group WHERE group_name = ?"
+        self.cur.execute(query_group_id, (group, ))
+        group_id = self.cur.fetchone()
+
+        if not group_id:
+            return "Group not found"
+
+        query_update_group = "UPDATE billboards_group SET schedule_id = ? WHERE billboards_group_id = ?"
+        self.cur.execute(query_update_group, (schedule_id[0], group_id[0]))
+        self.con.commit()
+
+        return "Schedules set successfully"
