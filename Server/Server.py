@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.9"
+            return "127.0.0.10"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -50,6 +50,8 @@ class Server:
             create_schedules_pattern = r'CREATE SCHEDULES Schedule Name: (\w+)'
             edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = "
             create_group_pattern = r'GET CREATE GROUP group_name = (\w+), schedule_name = (\w+)'
+            get_groups_pattern = r'GET ALL GROOPS for user = (\w+)'
+            move_pattern = r'MOVE BILLBOARDS x = (\d+(?:\.\d+)?), y = (\d+(?:\.\d+)?) TO GROUP name = (\w+)'
 
             while True:
                 print('Working...')
@@ -65,6 +67,8 @@ class Server:
                 create_schedules_match = re.search(create_schedules_pattern, data)
                 edit_schedules_match = re.search(edit_schedules_pattern, data)
                 create_group_match = re.search(create_group_pattern, data)
+                get_groups_match = re.search(get_groups_pattern, data)
+                move_match = re.search(move_pattern, data)
 
                 print(data)
 
@@ -111,6 +115,16 @@ class Server:
                         group_name = create_group_match.group(1)
                         schedule_name = create_group_match.group(2)
                         response_text = self.dataBase.createGroup(group_name, schedule_name)
+
+                    elif get_groups_match:
+                        owner_name = get_groups_match.group(1)
+                        response_text = self.dataBase.getGroopsForUser(owner_name)
+
+                    elif move_match:
+                        x_pos = float(move_match.group(1))
+                        y_pos = float(move_match.group(2))
+                        move_to = move_match.group(3)
+                        response_text = self.dataBase.moveBillboard(x_pos, y_pos, move_to)
 
                     elif create_schedules_match:
                         schedules_name = create_schedules_match.group(1)

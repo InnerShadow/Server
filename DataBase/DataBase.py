@@ -274,3 +274,62 @@ class DataBase:
 
         return "Group created successfully"
 
+
+    def getGroopsForUser(self, owner: str):
+        query = """
+            SELECT BG.group_name
+            FROM billboards_group AS BG
+            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            JOIN users AS U ON O.user_id = U.user_id
+            WHERE U.login = ?
+            UNION
+            SELECT BG.group_name
+            FROM billboards_group AS BG
+            WHERE BG.billboards_group_id NOT IN (
+                SELECT billboards_group_id
+                FROM ownership)"""
+
+        self.cur.execute(query, (owner, ))
+        result = self.cur.fetchall()
+        groups = [row[0] for row in result]
+
+        return " \n ".join([f"Group Name = {group_name}" for group_name in groups]) + " "
+
+
+    def moveBillboard(self, x_pos: float, y_pos: float, move_to: str):
+        query = "SELECT billboards_group_id FROM billboards_group WHERE group_name = ?"
+        self.cur.execute(query, (move_to,))
+        group_id = self.cur.fetchone()
+
+        if not group_id:
+            return "Group not found"
+
+        query = """
+            SELECT O.user_id
+            FROM ownership AS O
+            JOIN billboard AS B ON O.billboards_group_id = B.billboards_group_id
+            WHERE B.x_pos = ? AND B.y_pos = ?"""
+        
+        self.cur.execute(query, (x_pos, y_pos))
+        user_id = self.cur.fetchone()
+
+        if not user_id:
+            return "Billboard not found"
+
+        query = """
+            INSERT OR REPLACE INTO ownership (billboards_group_id, user_id)
+            VALUES (?, ?) """
+        
+        self.cur.execute(query, (group_id[0], user_id[0]))
+        self.con.commit()
+
+        query = """
+            UPDATE billboard
+            SET billboards_group_id = ?
+            WHERE x_pos = ? AND y_pos = ?"""
+        
+        self.cur.execute(query, (group_id[0], x_pos, y_pos))
+        self.con.commit()
+
+        return "Billboard moved successfully"
+
