@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.8"
+            return "127.0.0.9"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -48,7 +48,8 @@ class Server:
             register_patter = r'RESIGTER USER login = (\w+), password = (\w+), role = (\w+)'
             transfer_pattern = r'TRANSFER OWNERSHIP OF (\w+) TO (\w+)'
             create_schedules_pattern = r'CREATE SCHEDULES Schedule Name: (\w+)'
-            edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = (\w+)"
+            edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = "
+            create_group_pattern = r'GET CREATE GROUP group_name = (\w+), schedule_name = (\w+)'
 
             while True:
                 print('Working...')
@@ -63,6 +64,7 @@ class Server:
                 transfer_match = re.search(transfer_pattern, data)
                 create_schedules_match = re.search(create_schedules_pattern, data)
                 edit_schedules_match = re.search(edit_schedules_pattern, data)
+                create_group_match = re.search(create_group_pattern, data)
 
                 print(data)
 
@@ -83,6 +85,9 @@ class Server:
                     elif data == "GET ALL ADS":
                         response_text = self.dataBase.getAllAds()
 
+                    elif data == "GET ALL SCHEDULES":
+                        response_text = self.dataBase.getAllSchedules()
+
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
@@ -101,6 +106,11 @@ class Server:
                         billboard_grop = transfer_match.group(1)
                         username = transfer_match.group(2)
                         response_text = self.dataBase.transfer_ownership(username, billboard_grop)
+
+                    elif create_group_match:
+                        group_name = create_group_match.group(1)
+                        schedule_name = create_group_match.group(2)
+                        response_text = self.dataBase.createGroup(group_name, schedule_name)
 
                     elif create_schedules_match:
                         schedules_name = create_schedules_match.group(1)

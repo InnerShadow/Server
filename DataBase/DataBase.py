@@ -159,7 +159,6 @@ class DataBase:
 
 
     def transfer_ownership(self, transfer_to : str, billboard_group_name : str):
-
         query = "SELECT user_id FROM users WHERE login = ?"
         self.cur.execute(query, (transfer_to, ))
         new_owner_id = self.cur.fetchone()
@@ -206,7 +205,7 @@ class DataBase:
         self.con.commit()
 
         query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
-        self.cur.execute(query, (schedulesName,))
+        self.cur.execute(query, (schedulesName, ))
         schedule_id = self.cur.fetchone()
 
         if not schedule_id:
@@ -249,3 +248,29 @@ class DataBase:
         self.con.commit()
 
         return "Schedule updated successfully"
+
+
+    def getAllSchedules(self):
+        query = "SELECT schedule_name FROM schedule"
+
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        schedules = [row[0] for row in result]
+
+        return " \n ".join([f"Schedule Name = {schedule_name}" for schedule_name in schedules]) + " "
+
+
+    def createGroup(self, group_name: str, schedule_name: str):
+        query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+        self.cur.execute(query, (schedule_name, ))
+        existing_schedule_id = self.cur.fetchone()
+
+        if not existing_schedule_id:
+            return "Schedule not found"
+
+        query = "INSERT INTO billboards_group (group_name, schedule_id) VALUES (?, ?)"
+        self.cur.execute(query, (group_name, existing_schedule_id[0]))
+        self.con.commit()
+
+        return "Group created successfully"
+
