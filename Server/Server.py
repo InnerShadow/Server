@@ -54,6 +54,7 @@ class Server:
             move_pattern = r'MOVE BILLBOARDS x = (\d+(?:\.\d+)?), y = (\d+(?:\.\d+)?) TO GROUP name = (\w+)'
             schedules_user_pattern = r'GET ALL SCHEDULES FOR user = (\w+)'
             set_schedules_patern = r'SET SCHEDULE name = (\w+), FOR GROUP name = (\w+)'
+            change_password_pattern = r'USER name = (\w+) CHANGE PASSWORD FROM old = (\w+), TO new = (\w+)'
 
             while True:
                 print('Working...')
@@ -73,6 +74,7 @@ class Server:
                 move_match = re.search(move_pattern, data)
                 schedules_user_match = re.search(schedules_user_pattern, data)
                 set_schedules_match = re.search(set_schedules_patern, data)
+                change_password_match = re.search(change_password_pattern, data)
 
                 print(data)
 
@@ -139,6 +141,24 @@ class Server:
                         group = set_schedules_match.group(2)
                         response_text = self.dataBase.setSchedules(schedules, group)
 
+                    elif change_password_match:
+                        username = change_password_match.group(1)
+                        old_password = change_password_match.group(2)
+                        new_password = change_password_match.group(3)
+
+                        password_hash, salt = self.dataBase.getHashAndSalt(username)
+
+                        if password_hash is None or salt is None:
+                            response_text = "Not a user"
+
+                        else:
+                            resualt = self.encoder.checkpw(old_password, password_hash)
+                            if resualt:
+                                response_text = self.dataBase.updatePassword(username, new_password)
+
+                            else:
+                                response_text = "Wrong password"
+
                     elif create_schedules_match:
                         schedules_name = create_schedules_match.group(1)
                         ad_name_pattern = r'ad_name = (\w+(?: \w+)*)'
@@ -184,7 +204,7 @@ class Server:
                         response_text = open(vidio_url, 'rb').read()
 
                     else:
-                        response_text = "Invalod request!"
+                        response_text = "Invalid request!"
 
                     if isinstance(response_text, str):
                         print(response_text)

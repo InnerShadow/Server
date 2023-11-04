@@ -377,3 +377,16 @@ class DataBase:
         self.con.commit()
 
         return "Schedules set successfully"
+
+
+    def updatePassword(self, username: str, new_password):
+        encoder = Encoder()
+        salt, password_hash = encoder.getSaltAndHash(new_password)
+
+        query_update_password = "UPDATE users SET password_salt = ?, password_hash = ? WHERE login = ?"
+        self.cur.execute(query_update_password, (salt, password_hash, username))
+        self.con.commit()
+
+        return "Password updated successfully"
+
+    
