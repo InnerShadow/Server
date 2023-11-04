@@ -48,6 +48,7 @@ class Server:
             register_patter = r'RESIGTER USER login = (\w+), password = (\w+), role = (\w+)'
             transfer_pattern = r'TRANSFER OWNERSHIP OF (\w+) TO (\w+)'
             create_schedules_pattern = r'CREATE SCHEDULES Schedule Name: (\w+)'
+            edit_schedules_pattern = r"EDIT SCHEDULES schedules_name = (\w+)"
 
             while True:
                 print('Working...')
@@ -61,6 +62,7 @@ class Server:
                 register_match = re.search(register_patter, data)
                 transfer_match = re.search(transfer_pattern, data)
                 create_schedules_match = re.search(create_schedules_pattern, data)
+                edit_schedules_match = re.search(edit_schedules_pattern, data)
 
                 print(data)
 
@@ -109,6 +111,17 @@ class Server:
                             schedules.append(match.group(1))
 
                         response_text = self.dataBase.create_schedule(schedules_name, schedules)
+
+                    elif edit_schedules_match:
+                        schedules_name = edit_schedules_match.group(1)
+                        ad_name_pattern = r'ad_name = (\w+(?: \w+)*)'
+                        schedules = []
+
+                        for match in re.finditer(ad_name_pattern, data):
+                            schedules.append(match.group(1))
+
+                        response_text = self.dataBase.edit_schedule(schedules_name, schedules)
+
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)

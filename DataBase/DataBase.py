@@ -193,7 +193,7 @@ class DataBase:
         return " \n ".join([f"Ad = {ad_name}" for ad_name in ads]) + " "
 
 
-    def create_schedule(self, schedulesName, ad_list):
+    def create_schedule(self, schedulesName : str, ad_list : list[str]):
         query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
         self.cur.execute(query, (schedulesName,))
         existing_schedule_id = self.cur.fetchone()
@@ -225,4 +225,27 @@ class DataBase:
 
         return "Schedule created successfully"
     
-    
+
+    def edit_schedule(self, schedulesName: str, ad_list: list[str]):
+        query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"
+        self.cur.execute(query, (schedulesName,))
+        schedule_id = self.cur.fetchone()
+
+        if not schedule_id:
+            return "Schedule not found"
+
+        query = "DELETE FROM ad_schedule WHERE schedule_id = ?"
+        self.cur.execute(query, (schedule_id[0], ))
+
+        for priority, ad_name in enumerate(ad_list, start = 1):
+            query = """
+                INSERT INTO ad_schedule (schedule_id, ad_id, priority)
+                SELECT ?, A.ad_id, ?
+                FROM ad AS A
+                WHERE A.ad_name = ?"""
+            
+            self.cur.execute(query, (schedule_id[0], priority, ad_name))
+
+        self.con.commit()
+
+        return "Schedule updated successfully"
