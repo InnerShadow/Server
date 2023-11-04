@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.11"
+            return "127.0.0.19"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -55,6 +55,7 @@ class Server:
             schedules_user_pattern = r'GET ALL SCHEDULES FOR user = (\w+)'
             set_schedules_patern = r'SET SCHEDULE name = (\w+), FOR GROUP name = (\w+)'
             change_password_pattern = r'USER name = (\w+) CHANGE PASSWORD FROM old = (\w+), TO new = (\w+)'
+            upload_file_pattern = r'UPLOAD FILE file_name = (\w+)'
 
             while True:
                 print('Working...')
@@ -75,6 +76,7 @@ class Server:
                 schedules_user_match = re.search(schedules_user_pattern, data)
                 set_schedules_match = re.search(set_schedules_patern, data)
                 change_password_match = re.search(change_password_pattern, data)
+                upload_file_match = re.search(upload_file_pattern, data)
 
                 print(data)
 
@@ -202,6 +204,24 @@ class Server:
                     elif ad_match:
                         vidio_url = ad_match.group(1)
                         response_text = open(vidio_url, 'rb').read()
+
+                    elif upload_file_match:
+                        file_name = upload_file_match.group(1)
+                        file_path = f"Data/{file_name}.mp4"
+
+                        with open(file_path, 'wb') as file:
+                            while True:
+                                uploaded_chunk = client_socket.recv(1024)
+                                if not uploaded_chunk:
+                                    break
+                                file.write(uploaded_chunk)
+
+                            self.dataBase.create_ad(file_name, file_path)
+
+                            print("FILE UPLOADED")
+
+                            client_socket.shutdown(socket.SHUT_WR)
+                            continue
 
                     else:
                         response_text = "Invalid request!"

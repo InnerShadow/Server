@@ -338,18 +338,19 @@ class DataBase:
         query = """
             SELECT DISTINCT S.schedule_name
             FROM schedule AS S
-            JOIN ad_schedule AS ASch ON S.schedule_id = ASch.schedule_id
-            JOIN ad AS A ON ASch.ad_id = A.ad_id
-            JOIN billboards_group AS BG ON BG.schedule_id = S.schedule_id
-            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
-            JOIN users AS U ON O.user_id = U.user_id
-            WHERE U.login = ?
+            LEFT JOIN ad_schedule AS ASch ON S.schedule_id = ASch.schedule_id
+            LEFT JOIN ad AS A ON ASch.ad_id = A.ad_id
+            LEFT JOIN billboards_group AS BG ON BG.schedule_id = S.schedule_id
+            LEFT JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            LEFT JOIN users AS U ON O.user_id = U.user_id
+            WHERE U.login = ? OR BG.billboards_group_id IS NULL
             UNION
             SELECT DISTINCT S.schedule_name
             FROM schedule AS S
             WHERE S.schedule_id NOT IN (
-                SELECT schedule_id
+                SELECT DISTINCT schedule_id
                 FROM ad_schedule)"""
+        
         self.cur.execute(query, (owner,))
         result = self.cur.fetchall()
         schedules = [row[0] for row in result]
@@ -379,7 +380,7 @@ class DataBase:
         return "Schedules set successfully"
 
 
-    def updatePassword(self, username: str, new_password):
+    def updatePassword(self, username: str, new_password : str):
         encoder = Encoder()
         salt, password_hash = encoder.getSaltAndHash(new_password)
 
@@ -390,3 +391,8 @@ class DataBase:
         return "Password updated successfully"
 
     
+    def create_ad(self, file_name: str, file_path: str):
+        query = "INSERT INTO ad (video_url, ad_name) VALUES (?, ?)"
+        self.cur.execute(query, (file_path, file_name))
+        self.con.commit()
+
