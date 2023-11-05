@@ -439,3 +439,15 @@ class DataBase:
 
         return "Billboard created successfully"
 
+
+    def deleteBillboard(self, x_pos : float, y_pos : float):
+        self.cur.execute("SELECT billboard_id FROM billboard WHERE x_pos = ? AND y_pos = ?", (x_pos, y_pos))
+        result = self.cur.fetchone()
+
+        billboard_id = result[0]
+        self.cur.execute("DELETE FROM billboard WHERE billboard_id = ?", (billboard_id,))
+
+        self.con.commit()
+
+        return "Billboard has been deleted"
+

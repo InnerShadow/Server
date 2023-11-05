@@ -25,7 +25,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.21"
+            return "127.0.0.5"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -33,7 +33,6 @@ class Server:
 
 
     def start_server(self):
-
         #self.dataBase.register_user("127.0.0.5", "owner", "Dima", "1212")
 
         try:
@@ -57,6 +56,7 @@ class Server:
             change_password_pattern = r'USER name = (\w+) CHANGE PASSWORD FROM old = (\w+), TO new = (\w+)'
             upload_file_pattern = r'UPLOAD FILE file_name = (\w+)'
             create_billboard_pattern = r'CREATE NEW BILLBOARD FOR user = (\w+) IN group = (\w+) x_pos = ([\d.]+), y_pos = ([\d.]+)'
+            delte_billbord_pattern = r'REMOVE BILLBORD x_pos = ([\d.]+), y_pos = ([\d.]+)'
 
             while True:
                 print('Working...')
@@ -79,6 +79,7 @@ class Server:
                 change_password_match = re.search(change_password_pattern, data)
                 upload_file_match = re.search(upload_file_pattern, data)
                 create_billboard_match = re.search(create_billboard_pattern, data)
+                delte_billbord_match = re.search(delte_billbord_pattern, data)
 
                 print(data)
 
@@ -150,8 +151,12 @@ class Server:
                         group = create_billboard_match.group(2)
                         x_pos = float(create_billboard_match.group(3))
                         y_pos = float(create_billboard_match.group(4))
-
                         response_text = self.dataBase.createBillboard(username, group, x_pos, y_pos)
+
+                    elif delte_billbord_match:
+                        x_pos = float(delte_billbord_match.group(1))
+                        y_pos = float(delte_billbord_match.group(2))
+                        response_text = self.dataBase.deleteBillboard(x_pos, y_pos)
 
                     elif change_password_match:
                         username = change_password_match.group(1)
