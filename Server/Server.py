@@ -123,6 +123,7 @@ class Server:
                     elif get_logs_match:
                         username = get_logs_match.group(1)
                         response_text = self.logWriter.find_logs_by_name(username)
+                        self.logWriter.get_logs(client_address[0], username)
 
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)

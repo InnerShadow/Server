@@ -9,3 +9,9 @@ class Timer:
     def getCurrentTime(self):
         return datetime.now().isoformat()
     
+
+    def get_log_time(self):
+        now = datetime.now()
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        return formatted_time
+    
