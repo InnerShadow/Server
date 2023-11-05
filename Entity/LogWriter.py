@@ -188,6 +188,18 @@ class LogWriter:
         self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   succsesfully upload {file_name} file \n")
         self.file.flush()
 
+    
+    def get_exit_app(self, ip_address : str):
+        username = self.dataBase.userForIP(ip_address)
+        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   exit application \n")
+        self.file.flush()
+
+    
+    def get_watch_ad(self, ip_address : str, ad_name : str):
+        username = self.dataBase.userForIP(ip_address)
+        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   watch {ad_name} ad \n")
+        self.file.flush()
+
 
     def get_start_up_server(self):
         self.file.write(f"{self.timer.get_log_time()}   :::   START UP SERVER \n")

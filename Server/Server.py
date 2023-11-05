@@ -62,6 +62,7 @@ class Server:
             delte_billbord_pattern = r'REMOVE BILLBORD x_pos = ([\d.]+), y_pos = ([\d.]+)'
             delete_user_pattern = r'DELETE USER name = (\w+)'
             get_logs_patten = r'GET LOGS FOR user = (\w+)'
+            watch_ad_pattern = r'WATCH AD ad = (\w+)'
 
             while True:
                 print('Working...')
@@ -87,6 +88,7 @@ class Server:
                 delte_billbord_match = re.search(delte_billbord_pattern, data)
                 delete_user_match = re.search(delete_user_pattern, data)
                 get_logs_match = re.search(get_logs_patten, data)
+                watch_ad_match = re.search(watch_ad_pattern, data)
 
                 print(data)
 
@@ -119,6 +121,15 @@ class Server:
                     elif data == "GET ALL USERS":
                         response_text = self.dataBase.getAllUsers()
                         self.logWriter.get_all_users(client_address[0])
+
+                    elif data == "EXIT APP":
+                        response_text = "OK"
+                        self.logWriter.get_exit_app(client_address[0])
+
+                    elif watch_ad_match:
+                        ad_name = watch_ad_match.group(1)
+                        response_text = "OK"
+                        self.logWriter.get_watch_ad(client_address[0], ad_name)
 
                     elif get_logs_match:
                         username = get_logs_match.group(1)
