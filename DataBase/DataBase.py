@@ -120,6 +120,8 @@ class DataBase:
         
         self.con.commit()
 
+        return f"User {username} was created!"
+
     
     def getRole(self, username : str):
         query = """

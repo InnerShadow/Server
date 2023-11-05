@@ -115,7 +115,7 @@ class Server:
                         username = register_match.group(1)
                         password = register_match.group(2)
                         role = register_match.group(3)
-                        self.dataBase.register_user(client_address[0], role, username, password)
+                        response_text = self.dataBase.register_user(client_address[0], role, username, password)
 
                     elif transfer_match:
                         billboard_grop = transfer_match.group(1)
