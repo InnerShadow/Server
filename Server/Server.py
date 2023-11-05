@@ -5,6 +5,7 @@ import socket
 from DataBase.DataBase import *
 from Entity.Timer import *
 from Entity.Encoder import Encoder
+from Entity.LogWriter import LogWriter
 
 class Server:
     def __init__(self, port : int):
@@ -13,6 +14,8 @@ class Server:
         self.dataBase = DataBase()
         self.timer = Timer()
         self.encoder = Encoder()
+        self.logWriter = LogWriter(self.dataBase, self.timer)
+
         print(self.host)
 
 
@@ -33,7 +36,7 @@ class Server:
 
 
     def start_server(self):
-        #self.dataBase.register_user("127.0.0.5", "owner", "Dima", "1212")
+        self.logWriter.get_start_up_server()
 
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,6 +61,7 @@ class Server:
             create_billboard_pattern = r'CREATE NEW BILLBOARD FOR user = (\w+) IN group = (\w+) x_pos = ([\d.]+), y_pos = ([\d.]+)'
             delte_billbord_pattern = r'REMOVE BILLBORD x_pos = ([\d.]+), y_pos = ([\d.]+)'
             delete_user_pattern = r'DELETE USER name = (\w+)'
+            get_logs_patten = r'GET LOGS FOR user = (\w+)'
 
             while True:
                 print('Working...')
@@ -82,74 +86,95 @@ class Server:
                 create_billboard_match = re.search(create_billboard_pattern, data)
                 delte_billbord_match = re.search(delte_billbord_pattern, data)
                 delete_user_match = re.search(delete_user_pattern, data)
+                get_logs_match = re.search(get_logs_patten, data)
 
                 print(data)
 
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()
+                        self.logWriter.get_billboards(client_address[0])
 
                     elif data == "GET_TIME":
                         response_text = self.timer.init_time
+                        self.logWriter.get_time(client_address[0])
 
                     elif data == "CONTINUE AS VIEWER":
                         self.dataBase.register_user(client_address[0], 'viewer', 'simple_viewer', 'password')
+                        self.logWriter.continue_as_viewer(client_address[0])
                         response_text = "OK"
 
                     elif data == "GET OWNERS":
                         response_text = self.dataBase.get_owners()
+                        self.logWriter.get_owners(client_address[0])
 
                     elif data == "GET ALL ADS":
                         response_text = self.dataBase.getAllAds()
+                        self.logWriter.get_allAds(client_address[0])
 
                     elif data == "GET ALL SCHEDULES":
                         response_text = self.dataBase.getAllSchedules()
+                        self.logWriter.get_allSchedules(client_address[0])
 
                     elif data == "GET ALL USERS":
                         response_text = self.dataBase.getAllUsers()
+                        self.logWriter.get_all_users(client_address[0])
+
+                    elif get_logs_match:
+                        username = get_logs_match.group(1)
+                        response_text = self.logWriter.find_logs_by_name(username)
 
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
+                        self.logWriter.get_schedule_discription(client_address[0], schedules_name)
 
                     elif groop_owner_match:
                         owner = groop_owner_match.group(1)
                         response_text = self.dataBase.GetGroupsAndBillboardCounts(owner)
+                        self.logWriter.get_group_discription(client_address[0], owner)
 
                     elif register_match:
                         username = register_match.group(1)
                         password = register_match.group(2)
                         role = register_match.group(3)
                         response_text = self.dataBase.register_user(client_address[0], role, username, password)
+                        self.logWriter.get_resister(client_address[0], username, role)
 
                     elif transfer_match:
                         billboard_grop = transfer_match.group(1)
                         username = transfer_match.group(2)
                         response_text = self.dataBase.transfer_ownership(username, billboard_grop)
+                        self.logWriter.get_transer_ownership(client_address[0], username, billboard_grop)
 
                     elif create_group_match:
                         group_name = create_group_match.group(1)
                         schedule_name = create_group_match.group(2)
                         response_text = self.dataBase.createGroup(group_name, schedule_name)
+                        self.logWriter.get_cerate_group(client_address[0], group_name, schedule_name)
 
                     elif get_groups_match:
                         owner_name = get_groups_match.group(1)
                         response_text = self.dataBase.getGroopsForUser(owner_name)
+                        self.logWriter.get_groups_for_user(client_address[0], owner_name)
 
                     elif schedules_user_match:
                         owner_name = schedules_user_match.group(1)
                         response_text = self.dataBase.getSchedulesForUser(owner_name)
+                        self.logWriter.get_schedules_for_user(client_address[0], owner_name)
 
                     elif move_match:
                         x_pos = float(move_match.group(1))
                         y_pos = float(move_match.group(2))
                         move_to = move_match.group(3)
                         response_text = self.dataBase.moveBillboard(x_pos, y_pos, move_to)
+                        self.logWriter.get_move_to_group(client_address[0], x_pos, y_pos, move_to)
 
                     elif set_schedules_match:
                         schedules = set_schedules_match.group(1)
                         group = set_schedules_match.group(2)
                         response_text = self.dataBase.setSchedules(schedules, group)
+                        self.logWriter.get_set_schedue(client_address[0], schedules, group)
 
                     elif create_billboard_match:
                         username = create_billboard_match.group(1)
@@ -157,15 +182,18 @@ class Server:
                         x_pos = float(create_billboard_match.group(3))
                         y_pos = float(create_billboard_match.group(4))
                         response_text = self.dataBase.createBillboard(username, group, x_pos, y_pos)
+                        self.logWriter.get_create_billboard(client_address[0], username, group, x_pos, y_pos)
 
                     elif delte_billbord_match:
                         x_pos = float(delte_billbord_match.group(1))
                         y_pos = float(delte_billbord_match.group(2))
                         response_text = self.dataBase.deleteBillboard(x_pos, y_pos)
+                        self.logWriter.get_delete_billboard(client_address[0], x_pos, y_pos)
 
                     elif delete_user_match:
                         username = delete_user_match.group(1)
                         response_text = self.dataBase.deleteUser(username)
+                        self.logWriter.get_delete_billboard(client_address[0], username)
 
                     elif change_password_match:
                         username = change_password_match.group(1)
@@ -174,6 +202,8 @@ class Server:
 
                         password_hash, salt = self.dataBase.getHashAndSalt(username)
 
+                        self.logWriter.get_change_password(client_address[0], username)
+
                         if password_hash is None or salt is None:
                             response_text = "Not a user"
 
@@ -181,8 +211,10 @@ class Server:
                             resualt = self.encoder.checkpw(old_password, password_hash)
                             if resualt:
                                 response_text = self.dataBase.updatePassword(username, new_password)
+                                self.logWriter.get_succses_change_password(client_address[0], username)
 
                             else:
+                                self.logWriter.get_error_change_password(client_address[0], username)
                                 response_text = "Wrong password"
 
                     elif create_schedules_match:
@@ -204,16 +236,18 @@ class Server:
                             schedules.append(match.group(1))
 
                         response_text = self.dataBase.edit_schedule(schedules_name, schedules)
-
+                        self.logWriter.get_create_schedules(client_address[0], schedule_name, schedules)
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)
                         password = indendefication_match.group(2)
 
                         password_hash, salt = self.dataBase.getHashAndSalt(username)
+                        self.logWriter.get_log_in(client_address[0], username)
 
                         if password_hash is None or salt is None:
                             response_text = "IDENTIFICATION NOT OK"
+                            self.logWriter.get_log_in_failed(client_address[0], username)
 
                         else:
                             role = self.dataBase.getRole(username)
@@ -221,17 +255,22 @@ class Server:
                             if resualt:
                                 response_text = f"IDENDEFICATION OK role = {role} " 
                                 self.dataBase.updateIP(username, client_address[0])
+                                self.logWriter.get_log_in_succses(client_address[0], username)
 
                             else:
                                 response_text = "IDENDEFICATION NOT OK"
+                                self.logWriter.get_log_in_failed(client_address[0], username)
 
                     elif ad_match:
                         vidio_url = ad_match.group(1)
                         response_text = open(vidio_url, 'rb').read()
+                        self.logWriter.get_download_ad(client_address[0], vidio_url)
 
                     elif upload_file_match:
                         file_name = upload_file_match.group(1)
                         file_path = f"Data/{file_name}.mp4"
+
+                        self.logWriter.get_upload_ad(client_address[0], file_name)
 
                         with open(file_path, 'wb') as file:
                             while True:
@@ -242,7 +281,7 @@ class Server:
 
                             self.dataBase.create_ad(file_name, file_path)
 
-                            print("FILE UPLOADED")
+                            self.logWriter.get_upload_ad_succses(client_address[0], file_name)
 
                             client_socket.shutdown(socket.SHUT_WR)
                             continue
@@ -266,6 +305,8 @@ class Server:
                     print(f"Error: {e}")
         except KeyboardInterrupt:
             self.dataBase.delete_viewers()
+            self.logWriter.get_shout_down_server()
             server.close()
+            self.logWriter.close()
             print('Shutdown server.')
 

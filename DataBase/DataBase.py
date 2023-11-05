@@ -140,8 +140,7 @@ class DataBase:
         query = """
             DELETE FROM users
             WHERE login = 'simple_viewer' AND role_id = (
-                SELECT role_id FROM roles WHERE role_name = 'viewer'
-            )"""
+                SELECT role_id FROM roles WHERE role_name = 'viewer')"""
         
         self.cur.execute(query)
         self.con.commit()
@@ -228,13 +227,21 @@ class DataBase:
                 INSERT INTO ad_schedule (schedule_id, ad_id, priority)
                 SELECT ?, A.ad_id, ?
                 FROM ad AS A
-                WHERE A.ad_name = ?
-            """
+                WHERE A.ad_name = ?"""
+            
             self.cur.execute(query, (schedule_id[0], priority, ad_name))
         
         self.con.commit()
 
         return "Schedule created successfully"
+    
+
+    def create_ad(self, file_name : str, file_path : str):
+        query = "INSER INTO ad (video_url, ad_name) VALUES = (?, ?)"
+        
+        self.cur.execute(query, (file_name, file_path))
+        
+        self.con.commit()
     
 
     def edit_schedule(self, schedulesName: str, ad_list: list[str]):
@@ -471,4 +478,13 @@ class DataBase:
         self.con.commit()
 
         return f"User {username} has been delted"
+    
+
+    def userForIP(self, ip_address : str):
+        query = "SELECT login FROM users WHERE ip_address = ?"
+
+        self.cur.execute(query, (ip_address, ))
+        result = self.cur.fetchone()
+
+        return result[0]
     
