@@ -159,6 +159,16 @@ class DataBase:
 
         return " \n ".join([f"Owner name = {owner_name}" for owner_name in owner_names])
 
+    
+    def getAllUsers(self):
+        query = "SELECT login FROM users"
+
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        users_names = [row[0] for row in result]
+
+        return " \n ".join([f"User name = {user_name}" for user_name in users_names])
+
 
     def transfer_ownership(self, transfer_to : str, billboard_group_name : str):
         query = "SELECT user_id FROM users WHERE login = ?"
@@ -453,3 +463,12 @@ class DataBase:
 
         return "Billboard has been deleted"
 
+
+    def deleteUser(self, username : str):
+        query = "DELETE FROM users WHERE login = ?"
+
+        self.cur.execute(query, (username, ))
+        self.con.commit()
+
+        return f"User {username} has been delted"
+    

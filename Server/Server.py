@@ -57,6 +57,7 @@ class Server:
             upload_file_pattern = r'UPLOAD FILE file_name = (\w+)'
             create_billboard_pattern = r'CREATE NEW BILLBOARD FOR user = (\w+) IN group = (\w+) x_pos = ([\d.]+), y_pos = ([\d.]+)'
             delte_billbord_pattern = r'REMOVE BILLBORD x_pos = ([\d.]+), y_pos = ([\d.]+)'
+            delete_user_pattern = r'DELETE USER name = (\w+)'
 
             while True:
                 print('Working...')
@@ -80,6 +81,7 @@ class Server:
                 upload_file_match = re.search(upload_file_pattern, data)
                 create_billboard_match = re.search(create_billboard_pattern, data)
                 delte_billbord_match = re.search(delte_billbord_pattern, data)
+                delete_user_match = re.search(delete_user_pattern, data)
 
                 print(data)
 
@@ -102,6 +104,9 @@ class Server:
 
                     elif data == "GET ALL SCHEDULES":
                         response_text = self.dataBase.getAllSchedules()
+
+                    elif data == "GET ALL USERS":
+                        response_text = self.dataBase.getAllUsers()
 
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
@@ -157,6 +162,10 @@ class Server:
                         x_pos = float(delte_billbord_match.group(1))
                         y_pos = float(delte_billbord_match.group(2))
                         response_text = self.dataBase.deleteBillboard(x_pos, y_pos)
+
+                    elif delete_user_match:
+                        username = delete_user_match.group(1)
+                        response_text = self.dataBase.deleteUser(username)
 
                     elif change_password_match:
                         username = change_password_match.group(1)
