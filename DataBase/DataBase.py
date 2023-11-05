@@ -236,13 +236,13 @@ class DataBase:
         return "Schedule created successfully"
     
 
-    def create_ad(self, file_name : str, file_path : str):
-        query = "INSER INTO ad (video_url, ad_name) VALUES = (?, ?)"
+    def create_ad(self, file_name: str, file_path: str):
+        query = "INSERT INTO ad (video_url, ad_name) VALUES (?, ?)"
         
-        self.cur.execute(query, (file_name, file_path))
+        self.cur.execute(query, (file_path, file_name))
         
         self.con.commit()
-    
+
 
     def edit_schedule(self, schedulesName: str, ad_list: list[str]):
         query = "SELECT schedule_id FROM schedule WHERE schedule_name = ?"

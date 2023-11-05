@@ -28,7 +28,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.5"
+            return "127.0.0.11"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -248,7 +248,7 @@ class Server:
                             schedules.append(match.group(1))
 
                         response_text = self.dataBase.edit_schedule(schedules_name, schedules)
-                        self.logWriter.get_create_schedules(client_address[0], schedule_name, schedules)
+                        self.logWriter.get_create_schedules(client_address[0], schedules_name, schedules)
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)
