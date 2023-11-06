@@ -46,7 +46,7 @@ class Server:
             #Init server sockrt
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server.bind((self.host, self.port))
-            server.listen(4)
+            server.listen(8)
 
             #Get all posible patterns
             schedules_pattern = r'GET GROUP SCHEDULES schedules_name = (\w+)'
