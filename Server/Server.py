@@ -18,7 +18,6 @@ class Server:
         self.logWriter = LogWriter(self.dataBase, self.timer)
         self.last_update : datetime = self.timer.getCurrentTime()
 
-        print(self.host)
 
 
     #Getting local ip
