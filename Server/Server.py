@@ -1,6 +1,6 @@
-import os
 import re
 import socket
+from datetime import datetime
 
 from DataBase.DataBase import *
 from Entity.Timer import *
@@ -15,6 +15,7 @@ class Server:
         self.timer = Timer()
         self.encoder = Encoder()
         self.logWriter = LogWriter(self.dataBase, self.timer)
+        self.last_update : datetime = self.timer.getCurrentTime()
 
         print(self.host)
 
@@ -128,6 +129,9 @@ class Server:
                     elif data == "GET ADS SHOWED":
                         response_text = self.logWriter.get_showed_ads(client_address[0])
 
+                    elif data == "GET LAST UPDATE":
+                        response_text = self.last_update
+
                     elif data == "EXIT APP":
                         response_text = "OK"
                         self.logWriter.get_exit_app(client_address[0])
@@ -164,12 +168,14 @@ class Server:
                         username = transfer_match.group(2)
                         response_text = self.dataBase.transfer_ownership(username, billboard_grop)
                         self.logWriter.get_transer_ownership(client_address[0], username, billboard_grop)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif create_group_match:
                         group_name = create_group_match.group(1)
                         schedule_name = create_group_match.group(2)
                         response_text = self.dataBase.createGroup(group_name, schedule_name)
                         self.logWriter.get_cerate_group(client_address[0], group_name, schedule_name)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif get_groups_match:
                         owner_name = get_groups_match.group(1)
@@ -187,12 +193,14 @@ class Server:
                         move_to = move_match.group(3)
                         response_text = self.dataBase.moveBillboard(x_pos, y_pos, move_to)
                         self.logWriter.get_move_to_group(client_address[0], x_pos, y_pos, move_to)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif set_schedules_match:
                         schedules = set_schedules_match.group(1)
                         group = set_schedules_match.group(2)
                         response_text = self.dataBase.setSchedules(schedules, group)
                         self.logWriter.get_set_schedue(client_address[0], schedules, group)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif create_billboard_match:
                         username = create_billboard_match.group(1)
@@ -201,12 +209,14 @@ class Server:
                         y_pos = float(create_billboard_match.group(4))
                         response_text = self.dataBase.createBillboard(username, group, x_pos, y_pos)
                         self.logWriter.get_create_billboard(client_address[0], username, group, x_pos, y_pos)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif delte_billbord_match:
                         x_pos = float(delte_billbord_match.group(1))
                         y_pos = float(delte_billbord_match.group(2))
                         response_text = self.dataBase.deleteBillboard(x_pos, y_pos)
                         self.logWriter.get_delete_billboard(client_address[0], x_pos, y_pos)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif delete_user_match:
                         username = delete_user_match.group(1)
@@ -255,6 +265,7 @@ class Server:
 
                         response_text = self.dataBase.edit_schedule(schedules_name, schedules)
                         self.logWriter.get_create_schedules(client_address[0], schedules_name, schedules)
+                        self.last_update = self.timer.getCurrentTime()
 
                     elif indendefication_match:
                         username = indendefication_match.group(1)
