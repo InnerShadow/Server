@@ -28,7 +28,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.13"
+            return "127.0.0.17"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -124,6 +124,9 @@ class Server:
 
                     elif data == "GET ADS WATCHED":
                         response_text = self.logWriter.get_ads_watched(client_address[0])
+                    
+                    elif data == "GET ADS SHOWED":
+                        response_text = self.logWriter.get_showed_ads(client_address[0])
 
                     elif data == "EXIT APP":
                         response_text = "OK"

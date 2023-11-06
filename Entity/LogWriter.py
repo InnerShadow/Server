@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from DataBase.DataBase import DataBase
 from Entity.Timer import Timer
@@ -232,6 +233,41 @@ class LogWriter:
                     watched_ads_count += 1
 
         return str(watched_ads_count)
+
+    
+    def get_showed_ads(self, ip_address : str):
+        username = self.dataBase.userForIP(ip_address)
+        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to get all showed ads \n")
+        self.file.flush()
+
+        durations : list[int] = []
+        counts : list[int] = []
+
+        schedules_pattern = r'Schedule: (\w+)'
+        ads_pattern = r'Ad_duration: (\w+)'
+
+        schedules_matches = re.findall(schedules_pattern, self.dataBase.Get_billboards())
+
+        for schedule in schedules_matches:
+            durations.append(0)
+            counts.append(0)
+            ads_matches = re.findall(ads_pattern, self.dataBase.Get_schedule_contents(schedule))
+            for duration in ads_matches:
+                durations[-1] += int(duration)
+                counts[-1] += 1
+
+        time_difference = datetime.now() - datetime.fromisoformat(self.timer.init_time)
+        seconds_passed = int(time_difference.total_seconds())
+
+        total_ads = 0
+
+        for i in range(len(durations)):
+            numOfCycles = seconds_passed // durations[i]
+            numOfAds = numOfCycles * counts[i]
+            total_ads += numOfAds
+            #total_ads += (durations[i] // (seconds_passed % durations[i] + 1)) % counts[i]
+
+        return str(total_ads)
 
 
     def close(self):
