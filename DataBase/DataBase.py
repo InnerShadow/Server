@@ -355,18 +355,21 @@ class DataBase:
 
     def getSchedulesForUser(self, owner: str):
         query = """
-            SELECT BG.group_name
-            FROM billboards_group AS BG
-            JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
-            JOIN users AS U ON O.user_id = U.user_id
-            WHERE U.login = ?
-            UNION ALL
-            SELECT BG.group_name
-            FROM billboards_group AS BG
-            WHERE BG.billboards_group_id NOT IN (
-                SELECT billboards_group_id
-                FROM ownership)"""
-        
+            SELECT DISTINCT S.schedule_name
+            FROM schedule AS S
+            LEFT JOIN ad_schedule AS ASch ON S.schedule_id = ASch.schedule_id
+            LEFT JOIN ad AS A ON ASch.ad_id = A.ad_id
+            LEFT JOIN billboards_group AS BG ON BG.schedule_id = S.schedule_id
+            LEFT JOIN ownership AS O ON BG.billboards_group_id = O.billboards_group_id
+            LEFT JOIN users AS U ON O.user_id = U.user_id
+            WHERE U.login = ? OR BG.billboards_group_id IS NULL
+            UNION
+            SELECT DISTINCT S.schedule_name
+            FROM schedule AS S
+            WHERE S.schedule_id NOT IN (
+                SELECT DISTINCT schedule_id
+                FROM ad_schedule)"""
+
         self.cur.execute(query, (owner,))
         result = self.cur.fetchall()
         schedules = [row[0] for row in result]
