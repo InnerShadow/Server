@@ -216,6 +216,23 @@ class LogWriter:
         self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to export logs with filter {user} \n")
         self.file.flush()
 
+    
+    def get_ads_watched(self, ip_address : str):
+        username = self.dataBase.userForIP(ip_address)
+        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to get all watched ads \n")
+        self.file.flush()
+
+        watched_ads_count = 0
+        watch_pattern = r'watch (\w+) ad'
+
+        with open("Data/logs.txt", 'r') as f:
+            for line in f:
+                watch_match = re.search(watch_pattern, line)
+                if watch_match:
+                    watched_ads_count += 1
+
+        return str(watched_ads_count)
+
 
     def close(self):
         self.file.close()
