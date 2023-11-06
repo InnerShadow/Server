@@ -28,7 +28,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.19"
+            return "127.0.0.1"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
@@ -95,11 +95,11 @@ class Server:
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()
-                        self.logWriter.get_billboards(client_address[0])
+                        #self.logWriter.get_billboards(client_address[0])
 
                     elif data == "GET_TIME":
                         response_text = self.timer.init_time
-                        self.logWriter.get_time(client_address[0])
+                        #self.logWriter.get_time(client_address[0])
 
                     elif data == "CONTINUE AS VIEWER":
                         self.dataBase.register_user(client_address[0], 'viewer', 'simple_viewer', 'password')
@@ -108,19 +108,19 @@ class Server:
 
                     elif data == "GET OWNERS":
                         response_text = self.dataBase.get_owners()
-                        self.logWriter.get_owners(client_address[0])
+                        #self.logWriter.get_owners(client_address[0])
 
                     elif data == "GET ALL ADS":
                         response_text = self.dataBase.getAllAds()
-                        self.logWriter.get_allAds(client_address[0])
+                        #self.logWriter.get_allAds(client_address[0])
 
                     elif data == "GET ALL SCHEDULES":
                         response_text = self.dataBase.getAllSchedules()
-                        self.logWriter.get_allSchedules(client_address[0])
+                        #self.logWriter.get_allSchedules(client_address[0])
 
                     elif data == "GET ALL USERS":
                         response_text = self.dataBase.getAllUsers()
-                        self.logWriter.get_all_users(client_address[0])
+                        #self.logWriter.get_all_users(client_address[0])
 
                     elif data == "GET ADS WATCHED":
                         response_text = self.logWriter.get_ads_watched(client_address[0])
@@ -145,12 +145,12 @@ class Server:
                     elif schedules_match:
                         schedules_name = schedules_match.group(1)
                         response_text = self.dataBase.Get_schedule_contents(schedules_name)
-                        self.logWriter.get_schedule_discription(client_address[0], schedules_name)
+                        #self.logWriter.get_schedule_discription(client_address[0], schedules_name)
 
                     elif groop_owner_match:
                         owner = groop_owner_match.group(1)
                         response_text = self.dataBase.GetGroupsAndBillboardCounts(owner)
-                        self.logWriter.get_group_discription(client_address[0], owner)
+                        #self.logWriter.get_group_discription(client_address[0], owner)
 
                     elif register_match:
                         username = register_match.group(1)
@@ -174,12 +174,12 @@ class Server:
                     elif get_groups_match:
                         owner_name = get_groups_match.group(1)
                         response_text = self.dataBase.getGroopsForUser(owner_name)
-                        self.logWriter.get_groups_for_user(client_address[0], owner_name)
+                        #self.logWriter.get_groups_for_user(client_address[0], owner_name)
 
                     elif schedules_user_match:
                         owner_name = schedules_user_match.group(1)
                         response_text = self.dataBase.getSchedulesForUser(owner_name)
-                        self.logWriter.get_schedules_for_user(client_address[0], owner_name)
+                        #self.logWriter.get_schedules_for_user(client_address[0], owner_name)
 
                     elif move_match:
                         x_pos = float(move_match.group(1))
@@ -211,7 +211,7 @@ class Server:
                     elif delete_user_match:
                         username = delete_user_match.group(1)
                         response_text = self.dataBase.deleteUser(username)
-                        self.logWriter.get_delete_billboard(client_address[0], username)
+                        self.logWriter.get_delete_user(client_address[0], username)
 
                     elif change_password_match:
                         username = change_password_match.group(1)

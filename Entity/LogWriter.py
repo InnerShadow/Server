@@ -138,7 +138,7 @@ class LogWriter:
         self.file.flush()
 
     
-    def get_delete_billboard(self, ip_address : str, user : str):
+    def get_delete_user(self, ip_address : str, user : str):
         username = self.dataBase.userForIP(ip_address)
         self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to delete {user} user \n")
         self.file.flush()
@@ -237,10 +237,6 @@ class LogWriter:
 
     
     def get_ads_watched(self, ip_address : str):
-        username = self.dataBase.userForIP(ip_address)
-        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to get all watched ads \n")
-        self.file.flush()
-
         watched_ads_count = 0
         watch_pattern = r'watch (\w+) ad'
 
@@ -254,10 +250,6 @@ class LogWriter:
 
     
     def get_showed_ads(self, ip_address : str):
-        username = self.dataBase.userForIP(ip_address)
-        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   ask to get all showed ads \n")
-        self.file.flush()
-
         durations : list[int] = []
         counts : list[int] = []
 
@@ -304,9 +296,11 @@ class LogWriter:
         pattern = re.compile(r"\[([\d\.]+ - " + re.escape(name) + r")\]")
 
         with open("Data/logs.txt", 'r') as f:
-            for line in f:
-                if pattern.search(line):
-                    matching_logs.append(line.strip())
-        
-        return '\n'.join(matching_logs)
+            lines = f.readlines()
+
+        for line in lines:
+            if pattern.search(line):
+                matching_logs.append(line.strip())
+
+        return '\n'.join(reversed(matching_logs))
     
