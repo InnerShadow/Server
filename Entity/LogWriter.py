@@ -9,7 +9,25 @@ class LogWriter:
         self.dataBase = dataBase
         self.timer = timer
 
+        self.total_ads = 0
+
+        self.init_total_ads()
+
         self.file = open("Data/logs.txt", 'a')
+
+    
+    def init_total_ads(self):
+        ads_pattern = r'ads showed befor shut down - (\w+) '
+
+        try:
+            with open("Data/logs.txt", 'r') as f:
+                for line in f:
+                    watch_match = re.search(ads_pattern, line)
+                    if watch_match:
+                        self.total_ads = int(watch_match.group(1))
+        
+        except Exception:
+            self.total_ads = 0
 
 
     def get_billboards(self, ip_address : str):
@@ -259,18 +277,25 @@ class LogWriter:
         time_difference = datetime.now() - datetime.fromisoformat(self.timer.init_time)
         seconds_passed = int(time_difference.total_seconds())
 
-        total_ads = 0
+        current_ads = self.total_ads
 
         for i in range(len(durations)):
             numOfCycles = seconds_passed // durations[i]
             numOfAds = numOfCycles * counts[i]
-            total_ads += numOfAds
+            current_ads += numOfAds
             #total_ads += (durations[i] // (seconds_passed % durations[i] + 1)) % counts[i]
 
-        return str(total_ads)
+        return str(current_ads)
+
+
+    def save_ads_showed(self):
+        current_ads = self.get_showed_ads("127.0.0.1")
+        self.file.write(f"{self.timer.get_log_time()}   :::   ads showed befor shut down - {current_ads} \n")
+        self.file.flush()
 
 
     def close(self):
+        self.save_ads_showed()
         self.file.close()
 
 

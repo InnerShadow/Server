@@ -28,7 +28,7 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.17"
+            return "127.0.0.19"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
