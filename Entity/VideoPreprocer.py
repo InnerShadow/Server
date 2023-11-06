@@ -1,5 +1,6 @@
 from moviepy.editor import VideoFileClip
 
+#Class for getting vidio duration
 class VideoPreprocer:
     def __init__(self):
         pass

@@ -7,6 +7,7 @@ from Entity.Timer import *
 from Entity.Encoder import Encoder
 from Entity.LogWriter import LogWriter
 
+#Main server class
 class Server:
     def __init__(self, port : int):
         self.host = self.get_local_ip_address()
@@ -20,6 +21,7 @@ class Server:
         print(self.host)
 
 
+    #Getting local ip
     def get_local_ip_address(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -29,21 +31,24 @@ class Server:
             local_ip_address = s.getsockname()[0]
             s.close()
             
-            return "127.0.0.1"
+            #return "127.0.0.1"
             return local_ip_address
         except Exception as e:
             print(f"Error getting local IP address: {e}")
             return None
 
 
+    #Process all nedeed requests
     def start_server(self):
         self.logWriter.get_start_up_server()
 
         try:
+            #Init server sockrt
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server.bind((self.host, self.port))
             server.listen(4)
 
+            #Get all posible patterns
             schedules_pattern = r'GET GROUP SCHEDULES schedules_name = (\w+)'
             ad_pattern = r'ad_path = (.*?)$'
             groop_owner_patter = r'GET GROOP BY OWNER owner = (\w+)'
@@ -65,11 +70,15 @@ class Server:
             get_logs_patten = r'GET LOGS FOR user = (\w+)'
             watch_ad_pattern = r'WATCH AD ad = (\w+)'
 
+            #Wait for users requests
             while True:
                 print('Working...')
+
+                #recive and decode users requests
                 client_socket, client_address = server.accept()
                 data = client_socket.recv(1024).decode('utf-8')
 
+                #Find matches 
                 schedules_match = re.search(schedules_pattern, data)
                 ad_match = re.search(ad_pattern, data)
                 groop_owner_match = re.search(groop_owner_patter, data)
@@ -93,6 +102,7 @@ class Server:
 
                 print(data)
 
+                #Process matches
                 try:
                     if data == "GET_BILLBOARDS":
                         response_text = self.dataBase.Get_billboards()

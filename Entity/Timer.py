@@ -1,5 +1,6 @@
 from datetime import datetime
 
+#Class to monitore time
 class Timer:
     def __init__(self):
         self.init_time = datetime.now().isoformat()

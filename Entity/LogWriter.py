@@ -4,6 +4,7 @@ from datetime import datetime
 from DataBase.DataBase import DataBase
 from Entity.Timer import Timer
 
+#Write logs in "Data/logs.txt"
 class LogWriter:
     def __init__(self, dataBase : DataBase, timer : Timer):
         self.dataBase = dataBase
@@ -174,7 +175,10 @@ class LogWriter:
 
     def get_log_in(self, ip_address : str, name : str):
         username = self.dataBase.userForIP(ip_address)
-        self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   {name} try to log in \n")
+        if username is None:
+            self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - Undefined]   :::   {name} try to log in \n")
+        else:
+            self.file.write(f"{self.timer.get_log_time()}   :::   [{ip_address} - {username}]   :::   {name} try to log in \n")
         self.file.flush()
 
 

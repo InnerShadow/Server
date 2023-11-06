@@ -4,6 +4,7 @@ from Entity.Encoder import Encoder
 from Entity.VideoPreprocer import VideoPreprocer
 from DataBase.DataBaseCreater import DataBaseCreater
 
+#Class for execiting all nedeed SQL queryes
 class DataBase:
     def __init__(self):
         with sq.connect("Data/billboards.db") as con:
@@ -486,5 +487,9 @@ class DataBase:
         self.cur.execute(query, (ip_address, ))
         result = self.cur.fetchone()
 
-        return result[0]
+        if result is not None:
+            return result[0]
+        
+        else:
+            return None
     

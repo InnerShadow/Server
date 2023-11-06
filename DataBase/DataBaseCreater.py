@@ -4,6 +4,7 @@ class DataBaseCreater:
         self.cur = cur
 
 
+    #Create tables if it is first init
     def initDataBase(self):
         self.cur.execute("""CREATE TABLE IF NOT EXISTS roles (
                             role_id INTEGER PRIMARY KEY AUTOINCREMENT,

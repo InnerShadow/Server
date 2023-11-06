@@ -1,5 +1,6 @@
 import bcrypt
 
+#Class to encode users passwords
 class Encoder:
     def __init__(self):
         pass
