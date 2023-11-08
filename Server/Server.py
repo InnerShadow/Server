@@ -1,5 +1,7 @@
 import re
+import os
 import socket
+import glob
 from datetime import datetime
 
 from DataBase.DataBase import *
@@ -18,6 +20,7 @@ class Server:
         self.logWriter = LogWriter(self.dataBase, self.timer)
         self.last_update : datetime = self.timer.getCurrentTime()
 
+        print(self.host)
 
 
     #Getting local ip
@@ -144,6 +147,16 @@ class Server:
                     elif data == "EXIT APP":
                         response_text = "OK"
                         self.logWriter.get_exit_app(client_address[0])
+
+                    elif data == "GET TOTAL USERS":
+                        response_text = str(self.dataBase.get_num_users())
+
+                    elif data == "GET TOTAL BILLBOARDS":
+                        response_text = str(self.dataBase.get_totalBillboards())
+
+                    elif data == "GET ALL UPLOADED FILES":
+                        mp4_files = glob.glob(os.path.join("Data/", "*.mp4"))
+                        response_text = str(len(mp4_files))
 
                     elif watch_ad_match:
                         ad_name = watch_ad_match.group(1)

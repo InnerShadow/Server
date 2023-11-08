@@ -492,4 +492,24 @@ class DataBase:
         
         else:
             return None
+        
+
+    def get_num_users(self):
+        self.cur.execute("SELECT COUNT(*) FROM users")
+        result = self.cur.fetchone()
+
+        if result:
+            return result[0]
+        else:
+            return 0
     
+
+    def get_totalBillboards(self):
+        self.cur.execute("SELECT COUNT(*) FROM billboard")
+        result = self.cur.fetchone()
+
+        if result:
+            return result[0]
+        else:
+            return 0
+
