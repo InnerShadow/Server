@@ -158,6 +158,9 @@ class Server:
                         mp4_files = glob.glob(os.path.join("Data/", "*.mp4"))
                         response_text = str(len(mp4_files))
 
+                    elif data == "GET_ADS STATISTICS":
+                        response_text = self.logWriter.get_ads_statistics()
+
                     elif watch_ad_match:
                         ad_name = watch_ad_match.group(1)
                         response_text = "OK"

@@ -289,6 +289,27 @@ class LogWriter:
         self.file.write(f"{self.timer.get_log_time()}   :::   ads showed befor shut down - {current_ads} \n")
         self.file.flush()
 
+    
+    def get_ads_statistics(self):
+        ad_statistics = {}
+
+        with open("Data/logs.txt", "r") as log_file:
+            for line in log_file:
+                match = re.search(r"watch\s+(.*?)\s+ad", line)
+                if match:
+                    ad_info = match.group(1)
+
+                    if ad_info in ad_statistics:
+                        ad_statistics[ad_info] += 1
+                    else:
+                        ad_statistics[ad_info] = 1
+
+        result_string = ""
+        for ad_name, view_count in ad_statistics.items():
+            result_string += f"AD name = {ad_name}, views = {view_count} \n "
+        
+        return result_string + " "
+
 
     def close(self):
         self.save_ads_showed()
